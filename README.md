@@ -74,31 +74,31 @@ Para executar este projeto, é necessário ter o **Docker Desktop** instalado e 
 
 ---
 
-## Evidências de Funcionamento
+## 📸 Evidências de Funcionamento
 
-A seguir, algumas capturas de tela que demonstram a aplicação em funcionamento.
+A seguir, algumas capturas de ecrã que demonstram a aplicação em funcionamento.
 
 ### Tela de Login e Registo
 
-![Tela de Login](<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/d559e96e-10b0-4989-ab3c-cb15723a6c6e" />)
+![Tela de Login](https://github.com/user-attachments/assets/d559e96e-10b0-4989-ab3c-cb15723a6c6e)
 
 ### Dashboard Principal
 
-![Dashboard](<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/96fe7586-03ba-4a80-8df6-b437fd05a8dd" />)
+![Dashboard](https://github.com/user-attachments/assets/96fe7586-03ba-4a80-8df6-b437fd05a8dd)
 
 ### Gerenciamento de Projetos
 
-![Gerenciamento de Projetos](<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/1781349c-8096-4112-8ce3-d10fb2a2ab4f" />)
+![Gerenciamento de Projetos](https://github.com/user-attachments/assets/1781349c-8096-4112-8ce3-d10fb2a2ab4f)
 
 ### Gerenciamento de Tarefas
 
-![Gerenciamento de Tarefas](<img width="1919" height="1066" alt="image" src="https://github.com/user-attachments/assets/9108a494-b4fc-4d10-ad85-b72f470d409d" />)
+![Gerenciamento de Tarefas](https://github.com/user-attachments/assets/9108a494-b4fc-4d10-ad85-b72f470d409d)
 
-![Edição de Tarefas](<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/12fb32c7-99eb-475d-8547-3121d71a653c" />)
+![Edição de Tarefas](https://github.com/user-attachments/assets/12fb32c7-99eb-475d-8547-3121d71a653c)
 
 ### Prova de Consumo da API (Network Tab)
 
-
-![Consumo da API](<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/5f5e20a7-e5c5-488a-b0c7-b20023c755bc" />)
+![Consumo da API](https://github.com/user-attachments/assets/5f5e20a7-e5c5-488a-b0c7-b20023c755bc)
 
 ---
+
