@@ -1,37 +1,30 @@
 import React, { useState } from 'react';
 import { Task, Project, Label, TaskStatus } from '../types';
-import { TaskForm } from '../components/TaskForm';
+import { TaskForm, TaskFormData } from '../components/TaskForm';
 import { Modal } from '../components/Modal';
 import { Button } from '../components/common/Button';
 
 interface TasksPageProps {
-  tasks: Task[]; // Tarefas do usuário
-  projects: Project[]; // Projetos do usuário
-  labels: Label[];// Etiquetas do usuário
-  onAddTask: (task: Omit<Task, 'id'>) => void;
-  onUpdateTask: (task: Task) => void;
-  onDeleteTask: (taskId: number) => void;
-  getProjectTitleById: (projectId: number) => string; 
-  getLabelsByIds: (labelIds: number[]) => Label[]; 
+  tasks: Task[];
+  projects: Project[];
+  labels: Label[];
+  onAddTask: (projetoId: string, taskData: Omit<TaskFormData, 'projetoId'>) => Promise<void>;
+  onUpdateTask: (task: Task) => Promise<void>;
+  onMoveTask: (task: Task, newProjectId: string) => Promise<void>;
+  onDeleteTask: (task: Task) => Promise<void>;
 }
 
-const TaskStatusBadge: React.FC<{ status: TaskStatus }> = ({ status }) => {
+const TaskStatusBadge: React.FC<{ status: string }> = ({ status }) => {
   let bgColor = 'bg-slate-200';
   let textColor = 'text-slate-800';
 
   switch (status) {
     case TaskStatus.PENDENTE:
-      bgColor = 'bg-yellow-500'; 
-      textColor = 'text-black';   
-      break;
+      bgColor = 'bg-yellow-500'; textColor = 'text-black'; break;
     case TaskStatus.EM_ANDAMENTO:
-      bgColor = 'bg-[#596073]'; 
-      textColor = 'text-[#E0E0E0]'; 
-      break;
+      bgColor = 'bg-[#596073]'; textColor = 'text-[#E0E0E0]'; break;
     case TaskStatus.CONCLUIDA:
-      bgColor = 'bg-green-600';  
-      textColor = 'text-white';    
-      break;
+      bgColor = 'bg-green-600'; textColor = 'text-white'; break;
   }
   return (
     <span className={`px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${bgColor} ${textColor}`}>
@@ -40,11 +33,9 @@ const TaskStatusBadge: React.FC<{ status: TaskStatus }> = ({ status }) => {
   );
 };
 
-
 export const TasksPage: React.FC<TasksPageProps> = ({ 
   tasks, projects, labels, 
-  onAddTask, onUpdateTask, onDeleteTask,
-  getLabelsByIds
+  onAddTask, onUpdateTask, onMoveTask, onDeleteTask
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -70,21 +61,37 @@ export const TasksPage: React.FC<TasksPageProps> = ({
 
   const handleDeleteConfirm = () => {
     if (taskToDelete) {
-      onDeleteTask(taskToDelete.id);
+      onDeleteTask(taskToDelete);
       closeDeleteConfirm();
     }
   };
 
-  const handleSubmitTask = (taskData: Omit<Task, 'id'> | Task) => {
-    if ('id' in taskData) {
-      onUpdateTask(taskData as Task);
+  const handleSubmitTask = async (formData: TaskFormData) => {
+    if (editingTask) {
+      const projetoMudou = editingTask.projetoId !== formData.projetoId;
+
+      const updatedTask: Task = {
+        ...editingTask,
+        titulo: formData.titulo,
+        prazo: formData.prazo,
+        status: formData.status,
+        projetoId: formData.projetoId,
+        etiquetas: labels.filter(l => formData.etiquetaIds.includes(l.id))
+      };
+
+      if (projetoMudou) {
+        await onMoveTask(editingTask, formData.projetoId);
+      }
+      
+      await onUpdateTask(updatedTask);
+
     } else {
-      onAddTask(taskData as Omit<Task, 'id'>);
+      const { projetoId, ...taskData } = formData;
+      await onAddTask(projetoId, taskData);
     }
     handleCloseModal();
   };
 
-  // O usuário deve ter projetos para criar tarefas. Etiquetas são opcionais.
   const canCreateTask = projects.length > 0;
 
   return (
@@ -98,27 +105,26 @@ export const TasksPage: React.FC<TasksPageProps> = ({
 
       {tasks.length === 0 ? (
         <p className="text-[#A0A0A0]">
-        {!canCreateTask
-          ? "Por favor, crie um projeto antes de adicionar tarefas."
-          : 'Nenhuma tarefa encontrada. Clique em "Adicionar Nova Tarefa" para começar.'}
-      </p>
+          {!canCreateTask
+            ? "Por favor, crie um projeto antes de adicionar tarefas."
+            : 'Nenhuma tarefa encontrada. Clique em "Adicionar Nova Tarefa" para começar.'}
+        </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tasks.map((task) => {
-            const taskLabels = getLabelsByIds(task.labelIds); 
-            const projectTitle = projects.find(p => p.id === task.projectId)?.titulo || 'Projeto Desconhecido';
+            const projectTitle = projects.find(p => p.id === task.projetoId)?.titulo || 'Projeto Desconhecido';
             return (
               <div key={task.id} className="bg-[#0F1026] shadow-lg rounded-lg p-6 flex flex-col justify-between hover:shadow-xl transition-shadow border border-[#1D1A4B] hover:border-[#596073]">
                 <div>
                   <h2 className="text-xl font-semibold text-[#E0E0E0] mb-1">{task.titulo}</h2>
                   <TaskStatusBadge status={task.status} />
                   <p className="text-sm text-[#A0A0A0] mt-2 mb-1">Projeto: {projectTitle}</p>
-                  <p className="text-sm text-[#A0A0A0] mb-1">Prazo: {new Date(task.prazo + 'T00:00:00').toLocaleDateString()}</p>
-                  {taskLabels.length > 0 && (
+                  <p className="text-sm text-[#A0A0A0] mb-1">Prazo: {new Date(task.prazo).toLocaleDateString()}</p>
+                  {task.etiquetas?.length > 0 && (
                     <div className="mt-2 mb-3">
                       <p className="text-xs text-[#8C8A6C] mb-1">Etiquetas:</p>
                       <div className="flex flex-wrap gap-1">
-                        {taskLabels.map(label => (
+                        {task.etiquetas.map(label => (
                           <span key={label.id} style={{ backgroundColor: label.cor }} className="px-2 py-0.5 text-xs rounded-full text-white shadow-sm">{label.nome}</span>
                         ))}
                       </div>
@@ -138,8 +144,8 @@ export const TasksPage: React.FC<TasksPageProps> = ({
       <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={editingTask ? 'Editar Tarefa' : 'Adicionar Nova Tarefa'}>
         <TaskForm
           initialData={editingTask}
-          projects={projects} // Projetos do usuário
-          labels={labels} // Etiquetas do usuário
+          projects={projects}
+          labels={labels}
           onSubmit={handleSubmitTask}
           onCancel={handleCloseModal}
         />
@@ -150,8 +156,6 @@ export const TasksPage: React.FC<TasksPageProps> = ({
           <div>
             <p className="text-[#E0E0E0] mb-4">
               Tem certeza de que deseja excluir a tarefa "<strong>{taskToDelete.titulo}</strong>"?
-              <br />
-              Esta ação não pode ser desfeita.
             </p>
             <div className="flex justify-end space-x-3">
               <Button variant="secondary" onClick={closeDeleteConfirm}>Cancelar</Button>
@@ -160,16 +164,6 @@ export const TasksPage: React.FC<TasksPageProps> = ({
           </div>
         )}
       </Modal>
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.5s ease-out forwards;
-        }
-      `}</style>
     </div>
   );
 };

@@ -6,6 +6,8 @@ using TD_3_Web.Services.Usuario;
 
 namespace TD_3_Web.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IUsuarioService _usuarioService;

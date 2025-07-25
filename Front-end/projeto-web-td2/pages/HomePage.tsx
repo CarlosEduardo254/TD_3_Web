@@ -39,7 +39,7 @@ export const HomePage: React.FC<HomePageProps> = ({ projects, tasks, labels }) =
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Link to="/tarefas" className="bg-[#1D1A4B] text-[#E0E0E0] p-4 rounded-lg hover:bg-[#0F1026] transition-colors flex items-center space-x-2 border border-[#596073] hover:border-[#8C8A6C]">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.172AA48.354 48.354 0 0012 3.492c-2.33 0-4.513.38-6.524.978C4.345 4.01 3.5 4.973 3.5 6.108v9.642a2.25 2.25 0 002.25 2.25h1.5m1.5-1.5h5.625c.621 0 1.125.504 1.125 1.125v2.25c0 .621-.504 1.125-1.125 1.125H9.75V18zm.375-11.625h10.25M12 9.75M12 12.75M12 15.75M12 18.75M12 21.75c1.243 0 2.25-.936 2.25-2.063V6.108c0-.621-.504-1.125-1.125-1.125H10.875c-.621 0-1.125.504-1.125 1.125v13.57c0 1.126 1.007 2.062 2.25 2.062z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.172A48.354 48.354 0 0012 3.492c-2.33 0-4.513.38-6.524.978C4.345 4.01 3.5 4.973 3.5 6.108v9.642a2.25 2.25 0 002.25 2.25h1.5m-3.75-1.5h12.75" />
             </svg>
             <span>Ver Minhas Tarefas</span>
           </Link>

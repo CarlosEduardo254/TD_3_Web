@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Project, ProjectFormProps } from '../types';
+import { Project } from '../types';
 import { Input } from './common/Input';
 import { Textarea } from './common/Textarea';
 import { Button } from './common/Button';
 
-export const ProjectForm: React.FC<Omit<ProjectFormProps, 'users'>> = ({ initialData, onSubmit, onCancel }) => {
-  const [project, setProject] = useState<Omit<Project, 'id' | 'userId'>>({ 
+interface ProjectFormProps {
+    initialData?: Project | null;
+    onSubmit: (project: Omit<Project, 'id'>) => void;
+    onCancel: () => void;
+}
+
+export const ProjectForm: React.FC<ProjectFormProps> = ({ initialData, onSubmit, onCancel }) => {
+  const [project, setProject] = useState<Omit<Project, 'id'>>({ 
     titulo: '',
     descricao: '',
   });
 
   useEffect(() => {
     if (initialData) {
-      const { userId, id, ...formData } = initialData;
-      setProject(formData);
+      setProject({ titulo: initialData.titulo, descricao: initialData.descricao });
     } else {
       setProject({ titulo: '', descricao: '' });
     }

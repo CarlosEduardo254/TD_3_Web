@@ -1,39 +1,41 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Input } from '../components/common/Input';
 import { Button } from '../components/common/Button';
+import UserService from '../services/User/user.service';
 
-interface RegisterPageProps {
-  onRegister: (nome: string, email: string, senha: string) => boolean;
-}
-
-export const RegisterPage: React.FC<RegisterPageProps> = ({ onRegister }) => {
+export const RegisterPage: React.FC = () => {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [confirmarSenha, setConfirmarSenha] = useState('');
+  const [confirmacaoSenha, setConfirmarSenha] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!nome || !email || !senha || !confirmarSenha) {
+    if (!nome || !email || !senha || !confirmacaoSenha) {
       setError('Todos os campos são obrigatórios.');
       return;
     }
-    if (senha !== confirmarSenha) {
+    if (senha !== confirmacaoSenha) {
       setError('As senhas não coincidem.');
       return;
     }
-    // Validação de email
-    if (!/\S+@\S+\.\S+/.test(email)) {
-        setError('Por favor, insira um email válido.');
-        return;
-    }
+    
+    setIsLoading(true);
 
-    // onRegister cuidará da verificação de existência do email e do registro em si.
-    if (!onRegister(nome, email, senha)) {
+    try {
+      await UserService.register({ nome, email, senha, confirmacaoSenha });
+      // Após o registro bem-sucedido, envia o usuário para a página de login
+      navigate('/login', { state: { message: 'Cadastro realizado com sucesso! Faça o login.' } });
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Erro ao realizar o cadastro.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -70,7 +72,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onRegister }) => {
             type="password"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            placeholder="Crie uma senha"
+            placeholder="Crie uma senha (mínimo 8 caracteres)"
             required
           />
           <Input
@@ -78,14 +80,14 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onRegister }) => {
             id="confirmarSenha"
             name="confirmarSenha"
             type="password"
-            value={confirmarSenha}
+            value={confirmacaoSenha}
             onChange={(e) => setConfirmarSenha(e.target.value)}
             placeholder="Confirme sua senha"
             required
           />
           {error && <p className="text-sm text-red-500 text-center">{error}</p>}
-          <Button type="submit" variant="primary" className="w-full !py-3 text-lg" size="lg">
-            Registrar
+          <Button type="submit" variant="primary" className="w-full !py-3 text-lg" size="lg" disabled={isLoading}>
+            {isLoading ? 'Registrando...' : 'Registrar'}
           </Button>
         </form>
         <p className="text-sm text-center mt-4 text-[#A0A0A0]">

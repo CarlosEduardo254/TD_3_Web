@@ -1,25 +1,42 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Input } from '../components/common/Input';
 import { Button } from '../components/common/Button';
+import AuthService from '../services/Auth/auth.service';
+import { TOKEN_KEY } from '../services/shared/api.ts';
 
 interface LoginPageProps {
-  onLogin: (email: string, senha: string) => void; 
+  onLoginSuccess: () => void;
 }
 
-export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
+export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
     if (!email || !senha) {
       setError('Por favor, preencha o email e a senha.');
       return;
     }
-    onLogin(email, senha); 
+    
+    setIsLoading(true);
+
+    try {
+      const response = await AuthService.login({ email, senha });
+      localStorage.setItem(TOKEN_KEY, response.token); // Salva o token no localStorage
+      onLoginSuccess(); // Avisa o App.tsx para atualizar o estado do usuário
+      navigate('/'); // Navega para a página inicial
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Falha no login. Verifique suas credenciais.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -49,14 +66,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             required
           />
           {error && <p className="text-sm text-red-500 text-center">{error}</p>}
-          <Button type="submit" variant="primary" className="w-full !py-3 text-lg" size="lg">
-            Entrar
+          <Button type="submit" variant="primary" className="w-full !py-3 text-lg" size="lg" disabled={isLoading}>
+            {isLoading ? 'Entrando...' : 'Entrar'}
           </Button>
         </form>
-         <p className="text-xs text-center mt-6 text-[#A0A0A0]">
-            Use as credenciais de `INITIAL_USERS` para testar. <br/>
-            Ex: ana.silva@example.com.br / senha123
-        </p>
         <p className="text-sm text-center mt-4 text-[#A0A0A0]">
           Não tem uma conta?{' '}
           <Link to="/register" className="font-medium text-[#8C8A6C] hover:text-[#E0E0E0] underline">

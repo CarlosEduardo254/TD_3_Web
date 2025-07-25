@@ -1,15 +1,17 @@
-
 import React, { useState } from 'react';
 import { Label } from '../types';
 import { LabelForm } from '../components/LabelForm';
 import { Modal } from '../components/Modal';
 import { Button } from '../components/common/Button';
 
+
+type LabelCreationData = Omit<Label, 'id'>;
+
 interface LabelsPageProps {
-  labels: Label[]; // Etiquetas do usuário
-  onAddLabel: (label: Omit<Label, 'id' | 'userId'>) => void;
-  onUpdateLabel: (label: Label) => void;
-  onDeleteLabel: (labelId: number) => void;
+  labels: Label[];
+  onAddLabel: (label: LabelCreationData) => Promise<void>;
+  onUpdateLabel: (label: Label) => Promise<void>;
+  onDeleteLabel: (labelId: string) => Promise<void>; 
 }
 
 export const LabelsPage: React.FC<LabelsPageProps> = ({ labels, onAddLabel, onUpdateLabel, onDeleteLabel }) => {
@@ -42,8 +44,8 @@ export const LabelsPage: React.FC<LabelsPageProps> = ({ labels, onAddLabel, onUp
     }
   };
 
-  const handleSubmitLabel = (labelData: Omit<Label, 'id' | 'userId'>) => {
-     if (editingLabel && 'id' in editingLabel) {
+  const handleSubmitLabel = (labelData: LabelCreationData) => {
+     if (editingLabel) {
       onUpdateLabel({ ...editingLabel, ...labelData });
     } else {
       onAddLabel(labelData);
@@ -116,16 +118,6 @@ export const LabelsPage: React.FC<LabelsPageProps> = ({ labels, onAddLabel, onUp
           </div>
         )}
       </Modal>
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.5s ease-out forwards;
-        }
-      `}</style>
     </div>
   );
 };

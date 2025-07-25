@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { Project } from '../types';
+import { Project } from '../types'; 
 import { ProjectForm } from '../components/ProjectForm';
 import { Modal } from '../components/Modal';
 import { Button } from '../components/common/Button';
 
+// A ProjectCriacaoDto do service é basicamente um Projeto sem o ID
+type ProjectCreationData = Omit<Project, 'id'>;
+
 interface ProjectsPageProps {
-  projects: Project[];  // Projetos do Usuário
-  onAddProject: (project: Omit<Project, 'id' | 'userId'>) => void; // userId adicionado pelo App.tsx
-  onUpdateProject: (project: Project) => void; 
-  onDeleteProject: (projectId: number) => void;
+  projects: Project[];
+  onAddProject: (project: ProjectCreationData) => Promise<void>;
+  onUpdateProject: (project: Project) => Promise<void>;
+  onDeleteProject: (projectId: string) => Promise<void>; 
 }
 
 export const ProjectsPage: React.FC<ProjectsPageProps> = ({ projects, onAddProject, onUpdateProject, onDeleteProject }) => {
@@ -41,8 +44,8 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({ projects, onAddProje
     }
   };
 
-  const handleSubmitProject = (projectData: Omit<Project, 'id' | 'userId'>) => {
-    if (editingProject && 'id' in editingProject) {
+  const handleSubmitProject = (projectData: ProjectCreationData) => {
+    if (editingProject) {
       onUpdateProject({ ...editingProject, ...projectData });
     } else {
       onAddProject(projectData);
@@ -102,31 +105,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({ projects, onAddProje
         )}
       </Modal>
 
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.5s ease-out forwards;
-        }
-        .scrollbar-thin {
-          scrollbar-width: thin;
-          scrollbar-color: #596073 #1D1A4B;
-        }
-        .scrollbar-thin::-webkit-scrollbar {
-          width: 8px;
-        }
-        .scrollbar-thin::-webkit-scrollbar-track {
-          background: #1D1A4B;
-          border-radius: 10px;
-        }
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-          background-color: #596073;
-          border-radius: 10px;
-          border: 2px solid #1D1A4B;
-        }
-      `}</style>
+      {/* Estilos... */}
     </div>
   );
 };

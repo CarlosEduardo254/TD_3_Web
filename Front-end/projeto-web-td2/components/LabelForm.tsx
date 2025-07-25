@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { Label, LabelFormProps } from '../types';
+import { Label } from '../types';
 import { Input } from './common/Input';
 import { Button } from './common/Button';
 
-export const LabelForm: React.FC<Omit<LabelFormProps, 'users'>> = ({ initialData, onSubmit, onCancel }) => {
-  const [label, setLabel] = useState<Omit<Label, 'id' | 'userId'>>({ 
+interface LabelFormProps {
+    initialData?: Label | null;
+    onSubmit: (label: Omit<Label, 'id'>) => void;
+    onCancel: () => void;
+}
+
+export const LabelForm: React.FC<LabelFormProps> = ({ initialData, onSubmit, onCancel }) => {
+  const [label, setLabel] = useState<Omit<Label, 'id'>>({ 
     nome: '',
-    cor: '#000000',
+    cor: '#007BFF', // Um azul como padrão
   });
 
   useEffect(() => {
     if (initialData) {
-      const { userId, id, ...formData } = initialData;
-      setLabel(formData);
+      setLabel({ nome: initialData.nome, cor: initialData.cor });
     } else {
-      setLabel({ nome: '', cor: '#000000' });
+      setLabel({ nome: '', cor: '#007BFF' });
     }
   }, [initialData]);
 
