@@ -1,0 +1,5 @@
+{
+  "name": "Projeto Web TD2",
+  "description": "Uma aplicação de página única (SPA) para gerenciar usuários, projetos, tarefas e etiquetas com funcionalidade CRUD completa, desenvolvida com React, TypeScript e Tailwind CSS.",
+  "requestFramePermissions": []
+}
